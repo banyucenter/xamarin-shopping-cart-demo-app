@@ -3,7 +3,7 @@ using CoreGraphics;
 using Foundation;
 using ManateeShoppingCart;
 using ManateeShoppingCart.iOS;
-using ManateeShoppingCart.iOS.MWBarcodeScanner;
+using MWBarcodeScanner;
 using Newtonsoft.Json;
 using System;
 using System.Collections.ObjectModel;
@@ -16,13 +16,14 @@ using Xamarin.Forms.Platform.iOS;
 [assembly: ExportRenderer(typeof(ScanPage), typeof(ScanPageRenderer))]
 namespace ManateeShoppingCart.iOS
 {
-    public class ScanPageRenderer : PageRenderer
+    public class ScanPageRenderer : PageRenderer, IScanSuccessCallback
     {
         ObservableCollection<ItemModel> listItems;
         int editListIndex;
         int editItemIndex = -1;
+        Scanner scanner;
 
-        protected async override void OnElementChanged(VisualElementChangedEventArgs e)
+        protected override void OnElementChanged(VisualElementChangedEventArgs e)
         {
             base.OnElementChanged(e);
 
@@ -35,61 +36,131 @@ namespace ManateeShoppingCart.iOS
             try { editListIndex = int.Parse(((ScanPage)Element).editListIndex.ToString()); } catch { }
             try { editItemIndex = int.Parse(((ScanPage)Element).editItemIndex.ToString()); } catch { }
 
-            try
+            scanner = new Scanner();
+
+            /*
+			* Customize the scanner by using options below
+			*/
+
+            /* Select desired scanner interface orientation
+			* Available options are: LandscapeLeft, LandscapeRight, Portrait, All; Default: LandscapeLeft
+			*/
+            scanner.setInterfaceOrientation("All");
+
+            /* Toggle visibility of Flash button
+			* Available options are: true, false; Default: true
+			*/
+            //scanner.useFlash = true;
+
+            /* Toggle high resolution scanning - 1280x720 vs normal resolution scaning - 640x480
+			* Available options are: true, false; Default: true
+			*/
+            //scanner.useHiRes = true;
+
+            /* Choose between overlay types
+			* Available options are: OM_NONE, OM_MW (dynamic viewfinder), OM_IMAGE (static image overlay), OM_VIEW (custom view overlay); Default: OM_MW
+			*/
+            /*
+			scanner.overlayMode = ScannerBase.OM_VIEW;
+			UILabel label = new UILabel(new CGRect(50,50,200,50));
+			label.Text = "MW Barcode Scanner";
+			MWOverlay.overlayView = label;
+			*/
+
+            /* Toggle visibility of Zoom button
+			* Available options are: true, false; Default: true
+			*/
+            //scanner.useZoom = true;
+
+            /* Choose desired zoom levels
+			* zoomLevel1, zoomLevel2 - zoom level in % ; Default: 150,300
+			* initialZoomLevel       - the initial zoom level index; Available options: 0 (no zoom), 1, 2; Default: 0
+			*/
+            //scanner.setZoomLevels(200, 400, 1);
+
+            /* Set the number of CPU cores to be used
+			* Available options are: 1,2; Default 2
+			*/
+            //scanner.setMaxThreads(1);
+
+            /* Use 60 fps preview if available
+			* Available options are: true, false; Default: false;
+			*/
+            //scanner.use60fps = true;
+
+            /* 
+			* Set custom button frame
+			*/
+            // Defaults:
+            // scanner.setFlashButtonFrame(new CGRect(this.View.Frame.Size.Width-64,0,64,64));
+            // scanner.setCloseButtonFrame(new CGRect(0,0,64,64));
+            // scanner.setZoomButtonFrame(new CGRect(this.View.Frame.Size.Width-64,this.View.Frame.Size.Height-64,64,64));
+
+            /* Show on screen location of scanned code
+			* Available options are: true, false; Default: true;
+			* 
+			* Customise line width and line color with the provided params below
+			*/
+            // scanner.enableShowLocation = false;
+            // MWOverlay.locationLineColor = 0xff0000;
+            // MWOverlay.locationLineWidth = 2;
+            /* 
+			* Use the front camera of the device
+			* 
+			* Available options are: true, false; Default: false;
+			* 
+			*/
+            //scanner.useFrontCamera = true;
+
+            customDecoderInit();
+
+            scanner.ScanWithCallback(this);
+        }
+
+        public void barcodeDetected(MWResult result)
+        {
+            if (result != null)
             {
-                customDecoderInit();
-
-                Scanner scanner = new Scanner();
-                scanner.setInterfaceOrientation("All");
-
-                var result = await scanner.Scan();
-                if (result != null)
+                try
                 {
-                    try
+                    if (editItemIndex >= 0)
                     {
-                        if (editItemIndex >= 0)
-                        {
-                            listItems[editItemIndex].BarcodeResult = result.code;
-                            listItems[editItemIndex].BarcodeType = result.type;
-                        }
-                        else
-                        {
-                            ItemModel itemResult = new ItemModel();
-
-                            itemResult.ID = 1;
-                            if (listItems.Count > 0)
-                                itemResult.ID = ((int)listItems.Max(x => x.ID)) + 1;
-
-                            itemResult.Name = "";
-                            itemResult.BarcodeResult = result.code;
-                            itemResult.BarcodeType = result.type;
-
-                            listItems.Insert(0, itemResult);
-                        }
-
-                        if (Xamarin.Forms.Application.Current.Properties.ContainsKey("AllLists"))
-                        {
-                            string jsonList = Xamarin.Forms.Application.Current.Properties["AllLists"].ToString();
-                            ObservableCollection<ListsModel> tempList = JsonConvert.DeserializeObject<ObservableCollection<ListsModel>>(jsonList);
-
-                            tempList[editListIndex].Items = listItems;
-
-                            Xamarin.Forms.Application.Current.Properties["AllLists"] = JsonConvert.SerializeObject(tempList);
-                        }
+                        listItems[editItemIndex].BarcodeResult = result.text;
+                        listItems[editItemIndex].BarcodeType = result.typeName;
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        System.Diagnostics.Debug.WriteLine(ex.Message);
+                        ItemModel itemResult = new ItemModel();
+
+                        itemResult.ID = 1;
+                        if (listItems.Count > 0)
+                            itemResult.ID = ((int)listItems.Max(x => x.ID)) + 1;
+
+                        itemResult.Name = "";
+                        itemResult.BarcodeResult = result.text;
+                        itemResult.BarcodeType = result.typeName;
+
+                        listItems.Insert(0, itemResult);
+                    }
+
+                    if (Xamarin.Forms.Application.Current.Properties.ContainsKey("AllLists"))
+                    {
+                        string jsonList = Xamarin.Forms.Application.Current.Properties["AllLists"].ToString();
+                        ObservableCollection<ListsModel> tempList = JsonConvert.DeserializeObject<ObservableCollection<ListsModel>>(jsonList);
+
+                        tempList[editListIndex].Items = listItems;
+
+                        Xamarin.Forms.Application.Current.Properties["AllLists"] = JsonConvert.SerializeObject(tempList);
                     }
                 }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(ex.Message);
+                }
+            }
 
-                if (Element != null)
-                    await Element.Navigation.PopAsync();
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine(@"			ERROR: ", ex.Message);
-            }
+            if (Element != null)
+                Element.Navigation.PopAsync();
         }
 
         public static CGRect RECT_LANDSCAPE_1D = new CGRect(6, 20, 88, 60);
@@ -98,9 +169,7 @@ namespace ManateeShoppingCart.iOS
         public static CGRect RECT_PORTRAIT_2D = new CGRect(20, 6, 60, 88);
         public static CGRect RECT_FULL_1D = new CGRect(6, 6, 88, 88);
         public static CGRect RECT_FULL_2D = new CGRect(20, 6, 60, 88);
-
         public static CGRect RECT_DOTCODE = new CGRect(30, 20, 40, 60);
-
 
         public static void customDecoderInit()
         {
@@ -144,24 +213,22 @@ namespace ManateeShoppingCart.iOS
             // choose code type or types you want to search for
 
             // Our sample app is configured by default to search all supported barcodes...
-            BarcodeConfig.MWB_setActiveCodes(
-                                            BarcodeConfig.MWB_CODE_MASK_25 |
-                                            BarcodeConfig.MWB_CODE_MASK_39 |
-                                            BarcodeConfig.MWB_CODE_MASK_93 |
-                                            BarcodeConfig.MWB_CODE_MASK_128 |
-                                            BarcodeConfig.MWB_CODE_MASK_AZTEC |
-                                            BarcodeConfig.MWB_CODE_MASK_DM |
-                                            BarcodeConfig.MWB_CODE_MASK_EANUPC |
-                                            BarcodeConfig.MWB_CODE_MASK_PDF |
-                                            BarcodeConfig.MWB_CODE_MASK_QR |
-                                            BarcodeConfig.MWB_CODE_MASK_RSS |
-                                            BarcodeConfig.MWB_CODE_MASK_CODABAR |
-                                            BarcodeConfig.MWB_CODE_MASK_DOTCODE |
-                                            BarcodeConfig.MWB_CODE_MASK_11 |
-                                            BarcodeConfig.MWB_CODE_MASK_MSI |
-                                            BarcodeConfig.MWB_CODE_MASK_MAXICODE |
-                                            BarcodeConfig.MWB_CODE_MASK_POSTAL
-            );
+            BarcodeConfig.MWB_setActiveCodes(BarcodeConfig.MWB_CODE_MASK_25 |
+                BarcodeConfig.MWB_CODE_MASK_39 |
+                BarcodeConfig.MWB_CODE_MASK_93 |
+                BarcodeConfig.MWB_CODE_MASK_128 |
+                BarcodeConfig.MWB_CODE_MASK_AZTEC |
+                BarcodeConfig.MWB_CODE_MASK_DM |
+                BarcodeConfig.MWB_CODE_MASK_EANUPC |
+                BarcodeConfig.MWB_CODE_MASK_PDF |
+                BarcodeConfig.MWB_CODE_MASK_QR |
+                BarcodeConfig.MWB_CODE_MASK_CODABAR |
+                BarcodeConfig.MWB_CODE_MASK_RSS |
+                BarcodeConfig.MWB_CODE_MASK_MAXICODE |
+                BarcodeConfig.MWB_CODE_MASK_DOTCODE |
+                BarcodeConfig.MWB_CODE_MASK_11 |
+                BarcodeConfig.MWB_CODE_MASK_MSI |
+                BarcodeConfig.MWB_CODE_MASK_POSTAL);
 
             // But for better performance, only activate the symbologies your application requires...
             // BarcodeConfig.MWB_setActiveCodes( BarcodeConfig.MWB_CODE_MASK_25 );
@@ -173,12 +240,12 @@ namespace ManateeShoppingCart.iOS
             // BarcodeConfig.MWB_setActiveCodes( BarcodeConfig.MWB_CODE_MASK_EANUPC );
             // BarcodeConfig.MWB_setActiveCodes( BarcodeConfig.MWB_CODE_MASK_PDF );
             // BarcodeConfig.MWB_setActiveCodes( BarcodeConfig.MWB_CODE_MASK_QR );
-            // BarcodeConfig.MWB_setActiveCodes( BarcodeConfig.MWB_CODE_MASK_RSS );
             // BarcodeConfig.MWB_setActiveCodes( BarcodeConfig.MWB_CODE_MASK_CODABAR );
+            // BarcodeConfig.MWB_setActiveCodes( BarcodeConfig.MWB_CODE_MASK_RSS );
+            // BarcodeConfig.MWB_setActiveCodes( BarcodeConfig.MWB_CODE_MASK_MAXICODE );
             // BarcodeConfig.MWB_setActiveCodes( BarcodeConfig.MWB_CODE_MASK_DOTCODE );
             // BarcodeConfig.MWB_setActiveCodes( BarcodeConfig.MWB_CODE_MASK_11 );
             // BarcodeConfig.MWB_setActiveCodes( BarcodeConfig.MWB_CODE_MASK_MSI );
-            // BarcodeConfig.MWB_setActiveCodes( BarcodeConfig.MWB_CODE_MASK_MAXICODE );
             // BarcodeConfig.MWB_setActiveCodes( BarcodeConfig.MWB_CODE_MASK_POSTAL );
 
 
@@ -248,8 +315,6 @@ namespace ManateeShoppingCart.iOS
             BarcodeConfig.MWB_setMinLength(BarcodeConfig.MWB_CODE_MASK_39, 5);
             BarcodeConfig.MWB_setMinLength(BarcodeConfig.MWB_CODE_MASK_CODABAR, 5);
             BarcodeConfig.MWB_setMinLength(BarcodeConfig.MWB_CODE_MASK_11, 5);
-
-
 
             MWScannerViewController.setActiveParserMask(BarcodeConfig.MWP_PARSER_MASK_NONE);
 

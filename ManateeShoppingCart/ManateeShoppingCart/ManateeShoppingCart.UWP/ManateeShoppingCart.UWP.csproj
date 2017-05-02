@@ -94,26 +94,20 @@
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
     <None Include="project.json" />
-    <None Include="WinRT\WriteableBitmapEx.WinRT.pri" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="NativeComponents\BarcodeHelper.cs" />
     <Compile Include="ExtendedSplash.xaml.cs">
       <DependentUpon>ExtendedSplash.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="NativeComponents\MWOverlay.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="NativeComponents\ScannerPageNative.xaml.cs">
-      <DependentUpon>ScannerPageNative.xaml</DependentUpon>
-    </Compile>
     <Compile Include="ScanPageRenderer.cs" />
-    <Compile Include="NativeComponents\UWPContentDialog.xaml.cs">
+    <Compile Include="UWPContentDialog.xaml.cs">
       <DependentUpon>UWPContentDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="UWPMethods.cs" />
@@ -130,10 +124,7 @@
     <Content Include="Images\barcodeRect36x36.png" />
     <Content Include="Images\checkboxBlank36x36.png" />
     <Content Include="Images\checkboxMarked36x36.png" />
-    <Content Include="Images\flashbuttonoff.png" />
-    <Content Include="Images\flashbuttonon.png" />
     <Content Include="Images\listBulleted36x36.png" />
-    <Content Include="Images\overlay_mw.png" />
     <Content Include="Images\Pencil36x36.png" />
     <Content Include="Images\PencilWhite36x36.png" />
     <Content Include="Images\shopping36x36.png" />
@@ -149,11 +140,7 @@
     <Content Include="Assets\StoreLogo.png" />
     <Content Include="Images\trash36x36.png" />
     <Content Include="Assets\Wide310x150Logo.scale-100.png" />
-    <Content Include="Images\zoom.png" />
     <Content Include="Properties\Default.rd.xml" />
-    <Content Include="WinRT\WriteableBitmapEx.WinRT.dll" />
-    <Content Include="WinRT\WriteableBitmapEx.WinRT.pdb" />
-    <Content Include="WinRT\WriteableBitmapEx.WinRT.xml" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -168,20 +155,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="NativeComponents\ScannerPageNative.xaml">
+    <Page Include="UWPContentDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="NativeComponents\UWPContentDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ManateeShoppingCart\ManateeShoppingCart.csproj">
-      <Project>{c640bc2d-d198-4564-8537-ed30ce4ab8c4}</Project>
-      <Name>ManateeShoppingCart</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <SDKReference Include="BarcodeLibUniversalSDKW10, Version=1.0">
@@ -190,20 +167,25 @@
     <SDKReference Include="Microsoft.VCLibs, version=14.0">
       <Name>Visual C++ 2015 Runtime for Universal Windows Platform Apps</Name>
     </SDKReference>
-    <SDKReference Include="WindowsDesktop, Version=10.0.14393.0">
+    <SDKReference Include="WindowsDesktop, Version=10.0.10586.0">
       <Name>Windows Desktop Extensions for the UWP</Name>
     </SDKReference>
-    <SDKReference Include="WindowsMobile, Version=10.0.14393.0">
+    <SDKReference Include="WindowsMobile, Version=10.0.10586.0">
       <Name>Windows Mobile Extensions for the UWP</Name>
     </SDKReference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="WriteableBitmapEx.WinRT, Version=1.5.0.0, Culture=neutral, PublicKeyToken=50375ca6144f1c69, processorArchitecture=MSIL">
+    <ProjectReference Include="..\ManateeShoppingCart\ManateeShoppingCart.csproj">
+      <Project>{c640bc2d-d198-4564-8537-ed30ce4ab8c4}</Project>
+      <Name>ManateeShoppingCart</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="MWBarcodeScanner, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>WinRT\WriteableBitmapEx.WinRT.dll</HintPath>
+      <HintPath>MWBarcodeScanner\ARM\MWBarcodeScanner.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

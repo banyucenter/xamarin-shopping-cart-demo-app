@@ -26,6 +26,17 @@ namespace ManateeShoppingCart.Droid
 		
 		public static void UpdateIdValues()
 		{
+			global::MWBarcodeScanner.Resource.Drawable.flashbuttonoff = global::ManateeShoppingCart.Droid.Resource.Drawable.flashbuttonoff;
+			global::MWBarcodeScanner.Resource.Drawable.flashbuttonon = global::ManateeShoppingCart.Droid.Resource.Drawable.flashbuttonon;
+			global::MWBarcodeScanner.Resource.Drawable.overlay = global::ManateeShoppingCart.Droid.Resource.Drawable.overlay;
+			global::MWBarcodeScanner.Resource.Drawable.zoom = global::ManateeShoppingCart.Droid.Resource.Drawable.zoom;
+			global::MWBarcodeScanner.Resource.Id.RelativeLayout1 = global::ManateeShoppingCart.Droid.Resource.Id.RelativeLayout1;
+			global::MWBarcodeScanner.Resource.Id.flashButton = global::ManateeShoppingCart.Droid.Resource.Id.flashButton;
+			global::MWBarcodeScanner.Resource.Id.overlayImage = global::ManateeShoppingCart.Droid.Resource.Id.overlayImage;
+			global::MWBarcodeScanner.Resource.Id.preview_view = global::ManateeShoppingCart.Droid.Resource.Id.preview_view;
+			global::MWBarcodeScanner.Resource.Id.zoomButton = global::ManateeShoppingCart.Droid.Resource.Id.zoomButton;
+			global::MWBarcodeScanner.Resource.Layout.scanner = global::ManateeShoppingCart.Droid.Resource.Layout.scanner;
+			global::MWBarcodeScanner.Resource.String.library_name = global::ManateeShoppingCart.Droid.Resource.String.library_name;
 			global::Xamarin.Forms.Platform.Android.Resource.Attribute.actionBarSize = global::ManateeShoppingCart.Droid.Resource.Attribute.actionBarSize;
 		}
 		
@@ -2240,7 +2251,7 @@ namespace ManateeShoppingCart.Droid
 			public const int notification_template_icon_bg = 2130837681;
 			
 			// aapt resource value: 0x7f0200a8
-			public const int overlay_mw = 2130837672;
+			public const int overlay = 2130837672;
 			
 			// aapt resource value: 0x7f0200a9
 			public const int pencil36x36 = 2130837673;
@@ -2991,7 +3002,7 @@ namespace ManateeShoppingCart.Droid
 			public const int notification_template_part_time = 2130903091;
 			
 			// aapt resource value: 0x7f030034
-			public const int Scanner = 2130903092;
+			public const int scanner = 2130903092;
 			
 			// aapt resource value: 0x7f030035
 			public const int select_dialog_item_material = 2130903093;
@@ -3089,6 +3100,9 @@ namespace ManateeShoppingCart.Droid
 			
 			// aapt resource value: 0x7f080025
 			public const int character_counter_pattern = 2131230757;
+			
+			// aapt resource value: 0x7f080026
+			public const int library_name = 2131230758;
 			
 			// aapt resource value: 0x7f080000
 			public const int mr_button_content_description = 2131230720;

@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 using Xamarin.Forms;
 using Android.Speech.Tts;
 using ManateeShoppingCart.Droid;
-using ManateeShoppingCart.Droid.MWBarcodeScanner;
 
 [assembly: Xamarin.Forms.Dependency(typeof(DroidMethods))]
 namespace ManateeShoppingCart.Droid
